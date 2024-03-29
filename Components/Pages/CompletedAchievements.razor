@@ -31,6 +31,6 @@ else
 
     protected override async Task OnInitializedAsync()
     {
-        _completedAchievements = await _http.GetFromJsonAsync<TestAchieveClubApi.RepositoryItems.CompletedAchievement[]>("clubs");
+        _completedAchievements = await _http.GetFromJsonAsync<TestAchieveClubApi.RepositoryItems.CompletedAchievement[]>("completedAchievements");
     }
 }
