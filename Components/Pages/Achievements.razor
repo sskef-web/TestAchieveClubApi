@@ -1,0 +1,36 @@
+﻿@page "/achievements"
+@using TestAchieveClubApi.RepositoryItems
+@using MudBlazor
+
+@inject HttpClient _http
+
+@if(_achievements == null)
+{
+    <h1>Loading...</h1>
+}
+else
+{
+    @foreach (var achieve in _achievements)
+    {
+        <MudPaper Width="100%" Style="margin:2% 0 2% 0;border-radius:15px;">
+            <MudContainer MaxWidth="MaxWidth.Small">
+                <MudText Typo="Typo.h6">Id: @achieve.Id</MudText>
+                <MudText Typo="Typo.h6">Xp: @achieve.Xp.ToString()</MudText>
+                <MudText Typo="Typo.h6">Title: @achieve.Title</MudText>
+                <MudText Typo="Typo.h6">Description: @achieve.Description</MudText>
+                <MudText Typo="Typo.h6">Logo URL: @achieve.LogoURL</MudText>
+                <MudText Typo="Typo.h6">IsMultiple: @achieve.IsMultiple</MudText>
+            </MudContainer>
+        </MudPaper>
+    }
+}
+
+@code
+{
+    private Achievement[]? _achievements;
+
+    protected override async Task OnInitializedAsync()
+    {
+        _achievements = await _http.GetFromJsonAsync<Achievement[]>("achievements");
+    }
+}

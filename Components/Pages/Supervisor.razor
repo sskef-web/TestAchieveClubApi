@@ -1,0 +1,33 @@
+﻿@page "/supervisor"
+@using TestAchieveClubApi.RepositoryItems
+@using MudBlazor
+
+@inject HttpClient _http
+
+@if (_supervisors == null)
+{
+    <h1>Loading...</h1>
+}
+else
+{
+    @foreach (var supervisor in _supervisors)
+    {
+        <MudPaper Width="100%" Style="margin:2% 0 2% 0;border-radius:15px;">
+            <MudContainer MaxWidth="MaxWidth.Small">
+                <MudText Typo="Typo.h6">Id: @supervisor.Id</MudText>
+                <MudText Typo="Typo.h6">Name: @supervisor.Name</MudText>
+                <MudText Typo="Typo.h6">Key: @supervisor.Key</MudText>
+            </MudContainer>
+        </MudPaper>
+    }
+}
+
+@code
+{
+    private TestAchieveClubApi.RepositoryItems.Supervisor[]? _supervisors;
+
+    protected override async Task OnInitializedAsync()
+    {
+        _supervisors = await _http.GetFromJsonAsync<TestAchieveClubApi.RepositoryItems.Supervisor[]>("supervisors");
+    }
+}

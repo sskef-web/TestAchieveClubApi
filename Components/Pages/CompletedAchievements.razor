@@ -1,0 +1,36 @@
+﻿@page "/comletedAchieves"
+@using TestAchieveClubApi.RepositoryItems
+@using MudBlazor
+
+@inject HttpClient _http
+
+@if (_completedAchievements == null)
+{
+    <h1>Loading...</h1>
+}
+else
+{
+    @foreach (var completedachieve in _completedAchievements)
+    {
+        <MudPaper Width="100%" Style="margin:2% 0 2% 0;border-radius:15px;">
+            <MudContainer MaxWidth="MaxWidth.Small">
+                <MudText Typo="Typo.h6">Id: @completedachieve.Id</MudText>
+                <MudText Typo="Typo.h6">SupervisorId: @completedachieve.SupervisorId</MudText>
+                <MudText Typo="Typo.h6">UserId: @completedachieve.UserId</MudText>
+                <MudText Typo="Typo.h6">AchieveId: @completedachieve.AchieveId</MudText>
+                <MudText Typo="Typo.h6">DateOfCompletion: @completedachieve.DateOfCompletion</MudText>
+
+            </MudContainer>
+        </MudPaper>
+    }
+}
+
+@code
+{
+    private TestAchieveClubApi.RepositoryItems.CompletedAchievement[]? _completedAchievements;
+
+    protected override async Task OnInitializedAsync()
+    {
+        _completedAchievements = await _http.GetFromJsonAsync<TestAchieveClubApi.RepositoryItems.CompletedAchievement[]>("clubs");
+    }
+}

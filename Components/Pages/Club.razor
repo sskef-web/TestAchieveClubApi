@@ -1,0 +1,36 @@
+﻿@page "/clubs"
+@using TestAchieveClubApi.RepositoryItems
+@using MudBlazor
+
+@inject HttpClient _http
+
+@if (_clubs == null)
+{
+    <h1>Loading...</h1>
+}
+else
+{
+    @foreach (var club in _clubs)
+    {
+        <MudPaper Width="100%" Style="margin:2% 0 2% 0;border-radius:15px;">
+            <MudContainer MaxWidth="MaxWidth.Small">
+                <MudText Typo="Typo.h6">Id: @club.Id</MudText>
+                <MudText Typo="Typo.h6">Title: @club.Title</MudText>
+                <MudText Typo="Typo.h6">Desc: @club.Description</MudText>
+                <MudText Typo="Typo.h6">Adress: @club.Address</MudText>
+                <MudText Typo="Typo.h6">Logo URL: @club.LogoURL</MudText>
+                
+            </MudContainer>
+        </MudPaper>
+    }
+}
+
+@code
+{
+    private TestAchieveClubApi.RepositoryItems.Club[]? _clubs;
+
+    protected override async Task OnInitializedAsync()
+    {
+        _clubs = await _http.GetFromJsonAsync<TestAchieveClubApi.RepositoryItems.Club[]>("clubs");
+    }
+}

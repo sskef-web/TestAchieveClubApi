@@ -1,0 +1,33 @@
+﻿@page "/medals"
+@using TestAchieveClubApi.RepositoryItems
+@using MudBlazor
+
+@inject HttpClient _http
+
+@if (_medals == null)
+{
+    <h1>Loading...</h1>
+}
+else
+{
+    @foreach (var medal in _medals)
+    {
+        <MudPaper Width="100%" Style="margin:2% 0 2% 0;border-radius:15px;">
+            <MudContainer MaxWidth="MaxWidth.Small">
+                <MudText Typo="Typo.h6">Id: @medal.Id</MudText>
+                <MudText Typo="Typo.h6">Title: @medal.Title</MudText>
+                <MudText Typo="Typo.h6">Icon: @medal.Icon</MudText>
+            </MudContainer>
+        </MudPaper>
+    }
+}
+
+@code
+{
+    private TestAchieveClubApi.RepositoryItems.Medal[]? _medals;
+
+    protected override async Task OnInitializedAsync()
+    {
+        _medals = await _http.GetFromJsonAsync<TestAchieveClubApi.RepositoryItems.Medal[]>("medals");
+    }
+}

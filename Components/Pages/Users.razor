@@ -1,0 +1,37 @@
+﻿@page "/users"
+
+@using MudBlazor
+
+@inject HttpClient _http
+
+@if (_users == null)
+{
+    <h1>Loading...</h1>
+}
+else
+{
+    @foreach (var user in _users)
+    {
+        <MudPaper Width="100%" Style="margin:2% 0 2% 0;border-radius:15px;">
+            <MudContainer MaxWidth="MaxWidth.Small">
+                <MudText Typo="Typo.h6">Id: @user.Id</MudText>
+                <MudText Typo="Typo.h6">FirstName: @user.FirstName</MudText>
+                <MudText Typo="Typo.h6">LastName: @user.LastName</MudText>
+                <MudText Typo="Typo.h6">Email: @user.Email</MudText>
+                <MudText Typo="Typo.h6">Pass: @user.Password</MudText>
+                <MudText Typo="Typo.h6">Avatar: @user.Avatar</MudText>
+                <MudText Typo="Typo.h6">ClubRefId: @user.ClubRefId</MudText>
+            </MudContainer>
+        </MudPaper>
+    }
+}
+
+@code
+{
+    private User[]? _users;
+
+    protected override async Task OnInitializedAsync()
+    {
+        _users = await _http.GetFromJsonAsync<User[]>("users");
+    }
+}
