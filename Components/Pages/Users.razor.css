@@ -1,4 +1,7 @@
 ﻿.userPassButtons {
     display: flex;
-    width: 100%;
+}
+.columns {
+    display: flex;
+    flex-direction: row;
 }

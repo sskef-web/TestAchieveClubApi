@@ -2,8 +2,11 @@
 
 @using MudBlazor
 @using TestAchieveClubApi.RepositoryItems
+@using Syncfusion.Maui.Popup;
 
 @inject HttpClient _http
+@inject IDialogService DialogService
+
 
 @if (_users == null)
 {
@@ -13,48 +16,62 @@ else
 {
     @foreach (var user in _users)
     {
-        <MudPaper Width="100%" Style="margin:2% 0 2% 0;border-radius:15px;">
+        <MudPaper Width="100%" Style="margin:2% 0 2% 0;border-radius:15px; padding:2%;" Elevation="3">
             <MudContainer MaxWidth="MaxWidth.Small">
-                <MudText Typo="Typo.h6">Id: @user.Id</MudText>
-                <MudTextField Style="margin-right:0.5%;margin-left:0.5%;margin-bottom:1%;" Label="Имя" @bind-Value="@user.FirstName" T="string" Variant="Variant.Outlined" />
-                <MudTextField Lines="5" Style="margin-right:0.5%;margin-left:0.5%;margin-bottom:1%;" Label="Фамилия" @bind-Value="@user.LastName" T="string" Variant="Variant.Outlined" />
-                <MudTextField Style="margin-right:0.5%;margin-left:0.5%;margin-bottom:1%;" Label="Email" @bind-Value="@user.Email" T="string" Variant="Variant.Outlined" />
-                <MudTextField Style="margin-right:0.5%;margin-left:0.5%;margin-bottom:1%;" Label="Аватар" @bind-Value="@user.Avatar" T="string" Variant="Variant.Outlined" />
+                <MudText Typo="Typo.h6">User ID: @user.Id</MudText>
+                <MudTextField Style="margin-right:0.5%;margin-left:0.5%;margin-bottom:1%;" Label="Имя" @bind-Value="@user.FirstName" T="string" Variant="Variant.Filled" />
+                <MudTextField Lines="5" Style="margin-right:0.5%;margin-left:0.5%;margin-bottom:1%;" Label="Фамилия" @bind-Value="@user.LastName" T="string" Variant="Variant.Filled" />
+                <MudTextField Style="margin-right:0.5%;margin-left:0.5%;margin-bottom:1%;" Label="Email" @bind-Value="@user.Email" T="string" Variant="Variant.Filled" />
+                <MudTextField Style="margin-right:0.5%;margin-left:0.5%;margin-bottom:1%;" Label="Аватар" @bind-Value="@user.Avatar" T="string" Variant="Variant.Filled" />
                 <MudSelect Margin="Margin.Dense" T="int" Label="Место обучения" Variant="Variant.Filled" @bind-Value="@user.ClubRefId">
                     @foreach (var clubName in _clubs)
                     {
                         <MudSelectItem @bind-Value="@clubName.Id">@clubName.Title</MudSelectItem>
                     }
                 </MudSelect>
-                <MudContainer MaxWidth="MaxWidth.Small">
+                <MudPaper Width="100%" Style="margin:2% 0 2% 0;border-radius:15px;padding:5%;">
                     <MudTextField FullWidth="true" Style="margin-right:0.5%;margin-left:0.5%;margin-bottom:1%;" Label="Новый пароль" @bind-Value="@_newPassword" T="string" Variant="Variant.Outlined" />
                     <div class="userPassButtons">
-                        <MudButton Style="width:49%;margin-right:0.5%;margin-left:0.5%;" Variant="Variant.Filled" @onclick="()=>ChangeUserPassword(user.Id)">
+                        <MudButton Style="width:49.5%;margin-right:0.5%;" Variant="Variant.Filled" @onclick="()=>ChangeUserPassword(user.Id)">
                             Установить
                         </MudButton>
-                        <MudButton Style="width:49%;margin-right:0.5%;margin-left:0.5%;" Variant="Variant.Filled" @onclick="ClearNewPassword">
+                        <MudButton Style="width:49.5%;margin-left:0.5%;" Variant="Variant.Filled" @onclick="ClearNewPassword">
                             Очистить
                         </MudButton>
                     </div>
-                </MudContainer>
+                </MudPaper>
                 <div class="columns">
-                    <MudButton Style="width:49%;margin-left:0.5%;margin-right:0.5%;" Variant="Variant.Filled" @onclick="()=>EditUser(user)">
+                    <MudButton Style="width:49.5%;margin-right:0.5%;" Variant="Variant.Filled" @onclick="()=>EditUser(user)">
                         Сохранить пользователя
                     </MudButton>
-                    @* <MudButton Style="width:49%;margin-left:0.5%;margin-right:0.5%;" Variant="Variant.Filled" @onclick="()=>DeleteUser(user)">
+                    <MudButton Style="width:49.5%;margin-left:0.5%;" Variant="Variant.Filled" @onclick="()=>DeleteUser(user.Id)">
                         Удалить пользователя
-                    </MudButton> *@
+                    </MudButton>
                 </div>
             </MudContainer>
         </MudPaper>
     }
 }
+<MudButton FullWidth="true" Variant="Variant.Filled" @onclick="AddUser">
+    Добавить Нового пользователя
+</MudButton>
 
 @code
 {
+    @inject NavigationManager NavigationManager;
     private List<TestAchieveClubApi.RepositoryItems.Club> _clubs;
     private List<User> _users;
     private HashService _hashService = new HashService();
+
+    User newUser = new User
+        {
+            FirstName = "Имя",
+            LastName = "Фамилия",
+            Email = "Почта",
+            Avatar = "/image/avatars/8.jpg",
+            Password = "password",
+            ClubRefId = 1,
+        };
 
     private string _newPassword;
 
@@ -68,11 +85,29 @@ else
         PostUser(currentUser);
     }
 
+    private void AddUser()
+    {
+        PostUser(newUser);
+        ReloadPage();
+    }
+
+    private void ReloadPage()
+    {
+        NavigationManager.NavigateTo(NavigationManager.Uri, true);
+    }
+
     private async void EditUser(User user)
     {
         PostUser(user);
 
-        _users = await _http.GetFromJsonAsync<List<User>>("users");
+        ReloadPage();
+    }
+
+    private async Task DeleteUser(int id)
+    {
+        await _http.DeleteFromJsonAsync($"users/{id}", null);
+
+        ReloadPage();
     }
 
     protected async Task PostUser(User postUser)
