@@ -1,6 +1,7 @@
 ﻿@page "/users"
 
 @using MudBlazor
+@using TestAchieveClubApi.RepositoryItems
 
 @inject HttpClient _http
 
@@ -15,12 +16,35 @@ else
         <MudPaper Width="100%" Style="margin:2% 0 2% 0;border-radius:15px;">
             <MudContainer MaxWidth="MaxWidth.Small">
                 <MudText Typo="Typo.h6">Id: @user.Id</MudText>
-                <MudText Typo="Typo.h6">FirstName: @user.FirstName</MudText>
-                <MudText Typo="Typo.h6">LastName: @user.LastName</MudText>
-                <MudText Typo="Typo.h6">Email: @user.Email</MudText>
-                <MudText Typo="Typo.h6">Pass: @user.Password</MudText>
-                <MudText Typo="Typo.h6">Avatar: @user.Avatar</MudText>
-                <MudText Typo="Typo.h6">ClubRefId: @user.ClubRefId</MudText>
+                <MudTextField Style="margin-right:0.5%;margin-left:0.5%;margin-bottom:1%;" Label="Имя" @bind-Value="@user.FirstName" T="string" Variant="Variant.Outlined" />
+                <MudTextField Lines="5" Style="margin-right:0.5%;margin-left:0.5%;margin-bottom:1%;" Label="Фамилия" @bind-Value="@user.LastName" T="string" Variant="Variant.Outlined" />
+                <MudTextField Style="margin-right:0.5%;margin-left:0.5%;margin-bottom:1%;" Label="Email" @bind-Value="@user.Email" T="string" Variant="Variant.Outlined" />
+                <MudTextField Style="margin-right:0.5%;margin-left:0.5%;margin-bottom:1%;" Label="Аватар" @bind-Value="@user.Avatar" T="string" Variant="Variant.Outlined" />
+                <MudSelect Margin="Margin.Dense" T="int" Label="Место обучения" Variant="Variant.Filled" @bind-Value="@user.ClubRefId">
+                    @foreach (var clubName in _clubs)
+                    {
+                        <MudSelectItem @bind-Value="@clubName.Id">@clubName.Title</MudSelectItem>
+                    }
+                </MudSelect>
+                <MudContainer MaxWidth="MaxWidth.Small">
+                    <MudTextField FullWidth="true" Style="margin-right:0.5%;margin-left:0.5%;margin-bottom:1%;" Label="Новый пароль" @bind-Value="@_newPassword" T="string" Variant="Variant.Outlined" />
+                    <div class="userPassButtons">
+                        <MudButton Style="width:49%;margin-right:0.5%;margin-left:0.5%;" Variant="Variant.Filled" @onclick="()=>ChangeUserPassword(user.Id)">
+                            Установить
+                        </MudButton>
+                        <MudButton Style="width:49%;margin-right:0.5%;margin-left:0.5%;" Variant="Variant.Filled" @onclick="ClearNewPassword">
+                            Очистить
+                        </MudButton>
+                    </div>
+                </MudContainer>
+                <div class="columns">
+                    <MudButton Style="width:49%;margin-left:0.5%;margin-right:0.5%;" Variant="Variant.Filled" @onclick="()=>EditUser(user)">
+                        Сохранить пользователя
+                    </MudButton>
+                    @* <MudButton Style="width:49%;margin-left:0.5%;margin-right:0.5%;" Variant="Variant.Filled" @onclick="()=>DeleteUser(user)">
+                        Удалить пользователя
+                    </MudButton> *@
+                </div>
             </MudContainer>
         </MudPaper>
     }
@@ -28,10 +52,42 @@ else
 
 @code
 {
-    private User[]? _users;
+    private List<TestAchieveClubApi.RepositoryItems.Club> _clubs;
+    private List<User> _users;
+    private HashService _hashService = new HashService();
+
+    private string _newPassword;
+
+    private async void ChangeUserPassword(int userId)
+    {
+        User currentUser = _users.Find(user => user.Id == userId);
+
+        string newPasswordHash = _hashService.HashPassword(_newPassword).ToString();
+        currentUser.Password = newPasswordHash;
+
+        PostUser(currentUser);
+    }
+
+    private async void EditUser(User user)
+    {
+        PostUser(user);
+
+        _users = await _http.GetFromJsonAsync<List<User>>("users");
+    }
+
+    protected async Task PostUser(User postUser)
+    {
+        await _http.PutAsJsonAsync($"users/{postUser.Id}", postUser);
+    }
+
+    private void ClearNewPassword()
+    {
+        _newPassword = "";
+    }
 
     protected override async Task OnInitializedAsync()
     {
-        _users = await _http.GetFromJsonAsync<User[]>("users");
+        _users = await _http.GetFromJsonAsync<List<User>>("users");
+        _clubs = await _http.GetFromJsonAsync<List<TestAchieveClubApi.RepositoryItems.Club>>("clubs");
     }
 }

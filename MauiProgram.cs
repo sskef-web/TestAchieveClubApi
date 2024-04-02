@@ -25,7 +25,7 @@ namespace TestAchieveClubApi
             builder.Services.AddScoped(sp =>
     new HttpClient
     {
-        BaseAddress = new Uri("https://sskef.site/api/")
+        BaseAddress = new Uri("https://localhost:5001/api/")
     });
 
             return builder.Build();
