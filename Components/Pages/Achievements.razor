@@ -7,6 +7,9 @@
 @if(_achievements == null)
 {
     <MudProgressLinear Color="Color.Primary" Indeterminate="true" Class="my-7" />
+    <MudButton FullWidth="true" Variant="Variant.Filled" @onclick="AddAchieve">
+        Добавить
+    </MudButton>
 }
 else
 {
@@ -14,12 +17,20 @@ else
     {
         <MudPaper Width="100%" Style="margin:2% 0 2% 0;border-radius:15px;">
             <MudContainer MaxWidth="MaxWidth.Small">
-                <MudText Typo="Typo.h6">Id: @achieve.Id</MudText>
-                <MudText Typo="Typo.h6">Xp: @achieve.Xp.ToString()</MudText>
-                <MudText Typo="Typo.h6">Title: @achieve.Title</MudText>
-                <MudText Typo="Typo.h6">Description: @achieve.Description</MudText>
-                <MudText Typo="Typo.h6">Logo URL: @achieve.LogoURL</MudText>
-                <MudText Typo="Typo.h6">IsMultiple: @achieve.IsMultiple</MudText>
+                <MudText Typo="Typo.h6">Achievement Id: @achieve.Id</MudText>
+                <MudTextField Label="Название" @bind-Value="@achieve.Title" T="string" Variant="Variant.Outlined" />
+                <MudTextField Lines="2" Label="Описание" @bind-Value="@achieve.Description" T="string" Variant="Variant.Outlined" />
+                <MudTextField Label="Количество опыта" @bind-Value="@achieve.XpString" T="string" Variant="Variant.Outlined" />
+                <MudTextField Label="URL иконки" @bind-Value="@achieve.LogoURL" T="string" Variant="Variant.Outlined" />
+                <MudSwitch @bind-Checked="achieve.IsMultiple" Class="mud-width-full" Color="Color.Primary">Многоразовая или нет</MudSwitch>
+                @* <div class="columns">
+                    <MudButton Style="width:49%;margin-left:0.5%;margin-right:0.5%;" Variant="Variant.Filled" @onclick="()=>EditAchieve(achieve)">
+                        Сохранить
+                    </MudButton>
+                    <MudButton Style="width:49%;margin-left:0.5%;margin-right:0.5%;" Variant="Variant.Filled" @onclick="()=>DeleteAchieve(achieve)">
+                        Удалить
+                    </MudButton>
+                </div> *@
             </MudContainer>
         </MudPaper>
     }
@@ -28,6 +39,7 @@ else
 @code
 {
     private Achievement[]? _achievements;
+
 
     protected override async Task OnInitializedAsync()
     {
